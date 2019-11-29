@@ -53,9 +53,9 @@ const apolloServer = new ApolloServer({
 });
 apolloServer.applyMiddleware({ app, path: '/graphql' });
 
-// run server except in test env
+// run server except in test env where we trigger manually
 if (process.env.NODE_ENV !== 'test') {
-  app.listen({ port }), () => {
-    console.log(`🚀Server ready at http://localhost:${port}${apolloServer.graphqlPath}`);
-  }
+  app.listen({ port }, () => {
+    console.log(`🚀  Server ready at http://localhost:${port}${apolloServer.graphqlPath}`);
+  });
 }
