@@ -14,6 +14,8 @@ const port = process.env.PORT || 8080;
 
 const dataSources = () => ({ rtdFeedAPI: new RTDFeedAPI() });
 
+var request = require('request');
+
 // define APIs using GraphQL SDL
 const typeDefs = gql`
   type Query {
@@ -46,15 +48,13 @@ app.get('/call', (req, res) => {
       username: process.env.RTD_FEED_USERNAME,
       password: process.env.RTD_FEED_PASSWORD
     },
-    responseType: 'stream'
+    responseType: 'arraybuffer'
   })
   .then((response) => {
-    console.log(response.data);
-    const buff = new ArrayBuffer(response.data)
-    const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buff);
-    res.send(response);
+    const buffer = Buffer.from(response.data, 'base64');
+    const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buffer);
+    res.send(feed);
   }).catch((err) => {
-    console.log(err);
     res.send(err);
   });
 });
