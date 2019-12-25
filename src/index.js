@@ -14,8 +14,6 @@ const port = process.env.PORT || 8080;
 
 const dataSources = () => ({ rtdFeedAPI: new RTDFeedAPI() });
 
-var request = require('request');
-
 // define APIs using GraphQL SDL
 const typeDefs = gql`
   type Query {
@@ -41,7 +39,8 @@ const apolloServer = new ApolloServer({
 });
 apolloServer.applyMiddleware({ app, path: '/graphql' });
 
-app.get('/call', (req, res) => {
+// 1 minute updates
+app.get('/vehicle', (req, res) => {
   axios.get('http://www.rtd-denver.com/google_sync/VehiclePosition.pb', {
     withCredentials: true,
     auth: {
@@ -53,10 +52,31 @@ app.get('/call', (req, res) => {
   .then((response) => {
     const buffer = Buffer.from(response.data, 'base64');
     const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buffer);
-    res.send(feed);
+    res.send(feed.entity);
+    console.log(feed.entity)
   }).catch((err) => {
     res.send(err);
   });
+});
+
+// trip schedule
+app.get('/trip', (req, res) => {
+  axios.get('http://www.rtd-denver.com/google_sync/TripUpdate.pb', {
+    withCredentials: true,
+    auth: {
+      username: process.env.RTD_FEED_USERNAME,
+      password: process.env.RTD_FEED_PASSWORD
+    },
+    responseType: 'arraybuffer'
+  })
+    .then((response) => {
+      const buffer = Buffer.from(response.data, 'base64');
+      const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buffer);
+      res.send(feed.entity[0]);
+      console.log(feed.entity)
+    }).catch((err) => {
+      res.send(err);
+    });
 });
 
 // run server except in test env where we trigger manually

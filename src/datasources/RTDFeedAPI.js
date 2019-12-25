@@ -18,6 +18,7 @@ export default class RTDFeedAPI extends RESTDataSource {
       }
     });
 
-    return GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(res.data);
+    const buffer = Buffer.from(res.data, 'base64');
+    return GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buffer);
   }
 }
