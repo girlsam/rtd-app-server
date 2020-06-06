@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "apollo-datasource-rest": "^0.6.9",
-    "apollo-server-express": "^2.9.12",
+    "apollo-server-express": "^2.14.2",
     "bcrypt": "^3.0.7",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
